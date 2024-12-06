@@ -55,7 +55,8 @@ class CollabFilterOneVectorPerItem(AbstractBaseCollabFilterSGD):
         # TIP: use self.n_factors to access number of hidden dimensions
         self.param_dict = dict(
             # mean rating/baseline prediction 
-            mu=ag_np.ones(1) * ag_np.mean(train_tuple[2]),
+            # mu=ag_np.ones(1) * ag_np.mean(train_tuple[2]),
+            mu = ag_np.zeros(1),
             #bias of each user
             b_per_user=ag_np.ones(n_users), # FIX dimensionality
             #item-specific rating behavior 
@@ -85,12 +86,12 @@ class CollabFilterOneVectorPerItem(AbstractBaseCollabFilterSGD):
             Scalar predicted ratings, one per provided example.
             Entry n is for the n-th pair of user_id, item_id values provided.
         '''
-
-        mu = self.param_dict['mu']
-        b_per_user = self.param_dict['b_per_user']
-        c_per_item = self.param_dict['c_per_item']
-        U = self.param_dict['U']
-        V = self.param_dict['V']
+        if mu is None or b_per_user is None or c_per_item is None or U is None or V is None:
+            mu = self.param_dict['mu']
+            b_per_user = self.param_dict['b_per_user']
+            c_per_item = self.param_dict['c_per_item']
+            U = self.param_dict['U']
+            V = self.param_dict['V']
 
         # baseline for ratings
         yhat_N = mu + b_per_user[user_id_N] + c_per_item[item_id_N] + ag_np.sum(U[user_id_N] * V[item_id_N], axis=1)
@@ -125,7 +126,7 @@ class CollabFilterOneVectorPerItem(AbstractBaseCollabFilterSGD):
         # Add regularization for U and V
         U = param_dict['U']
         V = param_dict['V']
-        regularization = alpha * (ag_np.sum(U ** 2) + ag_np.sum(V ** 2))
+        regularization = alpha * (ag_np.sum(U ** 2) + ag_np.sum(V ** 2) + ag_np.sum( param_dict['b_per_user'])**2 + ag_np.sum( param_dict['c_per_item'])**2)
 
         # Combine loss and regularization
         loss_total = mean_squared + regularization
