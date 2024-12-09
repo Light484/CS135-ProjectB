@@ -86,11 +86,15 @@ class CollabFilterOneVectorPerItem(AbstractBaseCollabFilterSGD):
             Scalar predicted ratings, one per provided example.
             Entry n is for the n-th pair of user_id, item_id values provided.
         '''
-        if mu is None or b_per_user is None or c_per_item is None or U is None or V is None:
+        if mu is None:
             mu = self.param_dict['mu']
+        if b_per_user is None:
             b_per_user = self.param_dict['b_per_user']
+        if c_per_item is None:    
             c_per_item = self.param_dict['c_per_item']
+        if U is None:
             U = self.param_dict['U']
+        if V is None:
             V = self.param_dict['V']
 
         # baseline for ratings
@@ -126,7 +130,7 @@ class CollabFilterOneVectorPerItem(AbstractBaseCollabFilterSGD):
         # Add regularization for U and V
         U = param_dict['U']
         V = param_dict['V']
-        regularization = alpha * (ag_np.sum(U ** 2) + ag_np.sum(V ** 2) + ag_np.sum( param_dict['b_per_user'])**2 + ag_np.sum( param_dict['c_per_item'])**2)
+        regularization = alpha * (ag_np.sum(U ** 2) + ag_np.sum(V ** 2) + ag_np.sum( param_dict['b_per_user']**2) + ag_np.sum( param_dict['c_per_item']**2))
 
         # Combine loss and regularization
         loss_total = mean_squared + regularization
